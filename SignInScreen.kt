@@ -1,6 +1,7 @@
 package com.example.study.activity
 
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -10,8 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -29,6 +33,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -66,76 +72,79 @@ fun SignInScreen(
     val bottomPrompt = if (isSignUp) "Já tem uma conta?" else "Não tem uma conta?"
     val bottomLink = if (isSignUp) "Entrar" else "Criar Conta"
 
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .systemBarsPadding()
+    ){
+        Image(
+            painter = painterResource(id = R.drawable.background),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .background(Color.White)
-            .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(Modifier.height(8.dp))
+        )
 
-        Text(
-            text = titleText,
-            fontSize = 28.sp,
-            fontWeight = FontWeight.ExtraBold,
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 12.dp),
-            textAlign = TextAlign.Start
-        )
+                .fillMaxSize()
+                .systemBarsPadding()
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(50.dp))
 
-        TextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("E-mail")},
-            leadingIcon = { Icon(painterResource(R.drawable.ic_email), null) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.DarkGray,
-                unfocusedIndicatorColor = Color.Gray,
-                cursorColor = MaterialTheme.colorScheme.primary
+            Image(
+                painter = painterResource(id = R.drawable.studylogo),
+                contentDescription = "Descrição",
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(100.dp)
+                    .padding(top = 50.dp),
+                colorFilter = ColorFilter.tint(color = Color(0xFF2E3F9D))
+
 
             )
-        )
 
-        TextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Senha")},
-            leadingIcon = { Icon(painterResource(R.drawable.ic_password), null) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                TextButton(onClick = {showPassword = !showPassword}) {
-                    Text(if (showPassword) "Ocultar" else "Mostrar")
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.DarkGray,
-                unfocusedIndicatorColor = Color.Gray,
-                cursorColor = MaterialTheme.colorScheme.primary
+            Text(
+                text = titleText,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 75.dp, bottom = 12.dp),
+                textAlign = TextAlign.Center
             )
-        )
 
-        if (isSignUp){
             TextField(
-                value = user,
-                onValueChange = { user = it },
-                label = { Text("Usuário")},
-                singleLine = true,
-                leadingIcon = { Icon(painterResource(R.drawable.ic_profile), null) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("E-mail")},
+                leadingIcon = { Icon(painterResource(R.drawable.ic_email), null) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.DarkGray,
+                    unfocusedIndicatorColor = Color.Gray,
+                    cursorColor = MaterialTheme.colorScheme.primary
+
+                )
+            )
+
+            TextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Senha")},
+                leadingIcon = { Icon(painterResource(R.drawable.ic_password), null) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    TextButton(onClick = {showPassword = !showPassword}) {
+                        Text(if (showPassword) "Ocultar" else "Mostrar")
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
@@ -147,73 +156,98 @@ fun SignInScreen(
                 )
             )
 
-            Spacer(Modifier.height(40.dp))
-
-            Button(
-                onClick = { onPrimary(email, password, user) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryRed,
-                    contentColor = Color.White
-                ),
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.fillMaxWidth().height(52.dp)
-            ) {
-                Text(primaryText, fontWeight = FontWeight.Bold)
-            }
-        }
-
-        if(!isSignUp){
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 6.dp, bottom = 8.dp)
-            ){
-                TextButton(
-                    onClick = onForgotPassword,
-                    modifier = Modifier.align(Alignment.CenterEnd),
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = PrimaryRed
+            if (isSignUp){
+                TextField(
+                    value = user,
+                    onValueChange = { user = it },
+                    label = { Text("Usuário")},
+                    singleLine = true,
+                    leadingIcon = { Icon(painterResource(R.drawable.ic_profile), null) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.DarkGray,
+                        unfocusedIndicatorColor = Color.Gray,
+                        cursorColor = MaterialTheme.colorScheme.primary
                     )
+                )
+
+                Spacer(Modifier.height(40.dp))
+
+                Button(
+                    onClick = { onPrimary(email, password, user) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PrimaryRed,
+                        contentColor = Color.White
+                    ),
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.fillMaxWidth().height(52.dp)
                 ) {
-                    Text("Esqueci minha senha")
+                    Text(primaryText, fontWeight = FontWeight.Bold)
                 }
             }
 
-            Spacer(Modifier.height(14.dp))
+            if(!isSignUp){
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 6.dp, bottom = 8.dp)
+                ){
+                    TextButton(
+                        onClick = onForgotPassword,
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = Color(0xFF2F4BFF)
+                        )
+                    ) {
+                        Text("Esqueci minha senha")
+                    }
+                }
 
-            Button(
-                onClick = { onPrimary(email, password, user) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryRed,
-                    contentColor = Color.White
-                ),
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.fillMaxWidth().height(52.dp)
-            ) {
-                Text(primaryText, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(14.dp))
+
+                Button(
+                    onClick = { onPrimary(email, password, user) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2F4BFF),
+                        contentColor = Color.White
+                    ),
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.fillMaxWidth().height(52.dp)
+                ) {
+                    Text(primaryText, fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                val annotated = buildAnnotatedString {
+                    append(bottomPrompt)
+                    pushStringAnnotation("switch", "switch")
+                    withStyle(SpanStyle(color = Color(0xFF4AC4E0), fontWeight = FontWeight.Bold))
+                    { append(bottomLink) }
+                    pop()
+                }
+
+                Text(
+                    text = annotated,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(vertical = 18.dp)
+                        .navigationBarsPadding()
+                        .clickable(
+                            onClick = { onSwitch() }
+                        )
+                )
             }
-
-            Spacer(Modifier.weight(1f))
-
-            val annotated = buildAnnotatedString {
-                append(bottomPrompt)
-                pushStringAnnotation("switch", "switch")
-                withStyle(SpanStyle(color = PrimaryRed, fontWeight = FontWeight.Bold))
-                { append(bottomLink) }
-                pop()
-            }
-
-            Text(
-                text = annotated,
-                modifier = Modifier
-                    .padding(vertical = 18.dp)
-                    .navigationBarsPadding()
-                    .clickable(
-                        onClick = { onSwitch() }
-                    )
-            )
         }
+
     }
+
+
+
 }
 
 @Preview
