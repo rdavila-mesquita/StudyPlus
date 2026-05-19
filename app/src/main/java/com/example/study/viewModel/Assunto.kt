@@ -3,7 +3,6 @@ package com.example.study.viewModel
 import androidx.annotation.Keep
 import java.util.Date
 
-@Keep
 data class Assunto (
     val id: String = "",
     val titulo: String = "",

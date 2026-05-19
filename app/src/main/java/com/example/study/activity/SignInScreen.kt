@@ -186,23 +186,23 @@ fun SignInScreen(
             }
 
             if(!isSignUp){
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 6.dp, bottom = 8.dp)
-                ){
-                    TextButton(
-                        onClick = onForgotPassword,
-                        modifier = Modifier.align(Alignment.CenterEnd),
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = Color(0xFF2F4BFF)
-                        )
-                    ) {
-                        Text("Esqueci minha senha")
-                    }
-                }
-
-                Spacer(Modifier.height(14.dp))
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(top = 6.dp, bottom = 8.dp)
+//                ){
+//                    TextButton(
+//                        onClick = onForgotPassword,
+//                        modifier = Modifier.align(Alignment.CenterEnd),
+//                        colors = ButtonDefaults.textButtonColors(
+//                            contentColor = Color(0xFF2F4BFF)
+//                        )
+//                    ) {
+//                        Text("Esqueci minha senha")
+//                    }
+//                }
+//
+                Spacer(Modifier.height(34.dp))
 
                 Button(
                     onClick = { onPrimary(email, password, user) },

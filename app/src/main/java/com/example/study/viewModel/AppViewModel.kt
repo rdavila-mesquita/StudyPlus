@@ -5,12 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 
 class AppViewModel: ViewModel() {
@@ -27,6 +30,25 @@ class AppViewModel: ViewModel() {
         listaCompleta.filter { it.concluida }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000),emptyList())
 
+    private var timerJob: Job? = null
+    private val _totalTime = MutableStateFlow(3600 * 1000L)
+    private val _currentTime = MutableStateFlow(_totalTime.value)
+    private val _isTimerRunning = MutableStateFlow(false)
+
+    val totalTime: StateFlow<Long> = _totalTime.asStateFlow()
+    val currentTime: StateFlow<Long> = _currentTime.asStateFlow()
+    val isTimerRunning: StateFlow<Boolean> = _isTimerRunning.asStateFlow()
+
+    val timerProgress: StateFlow<Float> = MutableStateFlow(1f)
+        .also { progress ->
+            viewModelScope.launch {
+                currentTime.collect { time ->
+                    if (totalTime.value > 0) {
+                        progress.value = time.toFloat() / totalTime.value.toFloat()
+                    }
+                }
+            }
+        }
     fun saveAssunto(titulo: String, assunto: String, userId: String?){
         if (userId.isNullOrBlank()){
             Log.i("###", "Usuário não autenticado")
@@ -94,7 +116,7 @@ class AppViewModel: ViewModel() {
                 if (snapshot != null && snapshot.exists()) {
                     _assuntoEspecifico.value = snapshot.toObject(Assunto::class.java)
                 }else{
-                    Log.w("###", "Meta não encontrada")
+                    Log.w("###", "Assunto não encontrado")
                     _assuntoEspecifico.value = null
                 }
             }
@@ -168,6 +190,45 @@ class AppViewModel: ViewModel() {
             }
     }
 
+    fun definirTempoTotal(horas: Long) {
+        val novoTempoTotal = if (horas > 0) horas * 3600 * 1000L else 3600 * 1000L
+        _totalTime.value = novoTempoTotal
+        resetarTimer()
+    }
+
+    fun toggleTimer() {
+        _isTimerRunning.value = !_isTimerRunning.value
+        if (_isTimerRunning.value) {
+            iniciarTimer()
+        } else {
+            pararTimer()
+        }
+    }
+
+    fun resetarTimer() {
+        pararTimer()
+        _currentTime.value = _totalTime.value
+        _isTimerRunning.value = false
+    }
+
+    private fun iniciarTimer() {
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
+            while (_currentTime.value > 0 && _isTimerRunning.value) {
+                delay(100L)
+                _currentTime.value -= 100L
+            }
+            if (_currentTime.value <= 0) {
+                _isTimerRunning.value = false
+            }
+        }
+    }
+
+    private fun pararTimer() {
+        timerJob?.cancel()
+    }
 
     }
+
+
 

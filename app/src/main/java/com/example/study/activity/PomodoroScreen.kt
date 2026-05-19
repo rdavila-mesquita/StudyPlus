@@ -28,16 +28,11 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-
-
-// NECESSÁRIO para "by remember { mutableStateOf() }"
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import com.example.study.ui.theme.StudyTheme
-
-// ------------------------------------
 
 
 @Preview(
@@ -60,14 +55,14 @@ fun Pomodoro(onExit: () -> Unit = {}) {
 
     val context = LocalContext.current
 
-    val focusTime = 2 * 60  // 1500 segundos (25 min)
-    val breakTime = 1 * 60   // 300 segundos (5 min)
+    val focusTime = 2 * 60
+    val breakTime = 5 * 60
 
-    var timeLeft by remember { mutableStateOf(focusTime) }  // Inicia com foco
+    var timeLeft by remember { mutableStateOf(focusTime) }
     var isRunning by remember { mutableStateOf(false) }
     var mode by remember { mutableStateOf("FOCUS") }
     var totalFocusTime by remember { mutableStateOf(0) }
-    var cycleCount by remember { mutableStateOf(1) }  // Contador de ciclos
+    var cycleCount by remember { mutableStateOf(1) }
 
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
     var isMusicPlaying by remember { mutableStateOf(false) }
@@ -88,7 +83,6 @@ fun Pomodoro(onExit: () -> Unit = {}) {
 
 
     LaunchedEffect(isRunning, totalFocusTime) {
-        //onTotalFocusTime(totalFocusTime)
         if (isRunning)
             while (isRunning && timeLeft > 0) {
                 delay(1000)
@@ -100,29 +94,26 @@ fun Pomodoro(onExit: () -> Unit = {}) {
                         timeLeft = breakTime
                     } else {
                         mode = "FOCUS"
-                        timeLeft = focusTime  // Correção: reinicia foco
-                        cycleCount++  // Incrementa ciclo após descanso
+                        timeLeft = focusTime
+                        cycleCount++
                     }
                 }
             }
     }
 
-    // Layout principal (Box com flip numbers e botões)
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // Título da fase no topo
         Text(
             text = if (mode == "FOCUS") "Foco (Ciclo $cycleCount)" else "Descanso",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            color = if (mode == "FOCUS") Color.Gray else Color.Gray,  // Feedback visual
+            color = if (mode == "FOCUS") Color.Gray else Color.Gray,
             modifier = Modifier.align(Alignment.TopCenter).padding(top = 25.dp)
         )
 
-        // Flip numbers no centro
         Row(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -136,7 +127,6 @@ fun Pomodoro(onExit: () -> Unit = {}) {
             FlipNumber(number = seconds)
         }
 
-        // Botões na lateral direita
         Column(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
@@ -162,7 +152,6 @@ fun Pomodoro(onExit: () -> Unit = {}) {
             Spacer(modifier = Modifier.height(16.dp))
 
             RoundButton(Icons.Default.Refresh) {
-                // Reset para foco
                 timeLeft = focusTime
                 mode = "FOCUS"
                 isRunning = false
@@ -178,13 +167,6 @@ fun Pomodoro(onExit: () -> Unit = {}) {
         }
     }
 }
-
-//fun formatTime(time: Int): String {
-//    val minutes = time / 60
-//    val seconds = time % 60
-//    return "%02d:%02d".format(minutes, seconds)
-//}
-
 @Composable
 fun FlipNumber(number: String) {
     Box(

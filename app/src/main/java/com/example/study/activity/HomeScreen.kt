@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,12 +21,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,31 +52,65 @@ fun Home(
     onLogout: () -> Unit = {},
     onAdd: () -> Unit = {},
     onAssuntoClick: (Assunto) -> Unit,
+    onStatusChange: (Assunto, Boolean) -> Unit,
     assuntos: List<Assunto>
 ){
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         bottomBar = { BottomBar(onHomeClick = onHomeClick, onMetaClick = onProgressMetaClick) },
         floatingActionButton = { AddButton(onAdd) },
         floatingActionButtonPosition = FabPosition.Center
     ) {
         Column(modifier = Modifier.fillMaxSize().padding(bottom = 70.dp)) {
-            Header(onLogout)
+            Header(onLogout = {showLogoutDialog = true})
             Text(
                 "O que você vai estudar hoje?",
-                fontSize = 30.sp,
+                fontSize = 25.sp,
+                lineHeight = 45.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF2E3F9D),
                 modifier = Modifier.padding(20.dp)
             )
-            AssuntoList(assuntos = assuntos, onMetaClick = onAssuntoClick)
+            AssuntoList(assuntos = assuntos, onMetaClick = onAssuntoClick, onStatusChange = onStatusChange)
         }
+    }
+
+    if(showLogoutDialog){
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false},
+            title = { Text("Confirmar Logout")},
+            text = { Text("Tem certeza que deseja sair?")},
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onLogout()
+                        showLogoutDialog = false
+                    }
+                ) {
+                    Text("Sair", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showLogoutDialog = false}
+                )
+                {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 }
 
 
 
+
+
+
 @Composable
 fun Header(onLogout: () -> Unit){
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -126,7 +167,11 @@ fun AddButton(onAdd: () -> Unit){
 }
 
 @Composable
-fun AssuntoList(assuntos: List<Assunto>, onMetaClick: (Assunto) -> Unit = {}){
+fun AssuntoList(
+    assuntos: List<Assunto>,
+    onMetaClick: (Assunto) -> Unit = {},
+    onStatusChange: (Assunto, Boolean) -> Unit
+){
     if (assuntos.isEmpty()){
     Text(
         "Nenhum assunto? Adicione e vamos estudar!",
@@ -139,8 +184,14 @@ fun AssuntoList(assuntos: List<Assunto>, onMetaClick: (Assunto) -> Unit = {}){
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp)
             ) {
-            items(assuntos){ meta ->
-                AssuntoCard(assunto = meta, onMetaClick = { onMetaClick(meta) })
+            items(assuntos){ assuntoItem ->
+                AssuntoCard(
+                    assunto = assuntoItem,
+                    onMetaClick = { onMetaClick(assuntoItem) },
+                    onStatusChange = { novoStatus ->
+                        onStatusChange(assuntoItem, novoStatus)
+                    }
+                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -148,7 +199,7 @@ fun AssuntoList(assuntos: List<Assunto>, onMetaClick: (Assunto) -> Unit = {}){
 }
 
 @Composable
-fun AssuntoCard(assunto: Assunto, onMetaClick: () -> Unit = {}){
+fun AssuntoCard(assunto: Assunto, onMetaClick: () -> Unit = {}, onStatusChange: (Boolean) -> Unit){
 
     Row(
         modifier = Modifier
@@ -180,23 +231,37 @@ fun AssuntoCard(assunto: Assunto, onMetaClick: () -> Unit = {}){
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        Text(
-            text = assunto.titulo,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f)
-        )
+            Text(
+                text = assunto.titulo,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.height(40.dp).offset(y = 10.dp)
+            )
 
-        Text(
-            text = assunto.data.toString(),
-            fontSize = 12.sp,
-            color = Color.Gray
-        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier
+                .fillMaxWidth()
+//                .height(40.dp)
+        ) {
+            CheckBox(assunto = assunto, onStatusChange = onStatusChange)
+        }
     }
 }
 
-@Preview()
+@Preview(showBackground = true)
 @Composable
 fun HomePreview(){
-    Home(assuntos = emptyList(), onAssuntoClick = {})
+    val sampleAssuntos = listOf(
+        Assunto(id = "1", titulo = "Estudar Jetpack Compose", concluida = false),
+        Assunto(id = "2", titulo = "Revisar Coroutines", concluida = true)
+    )
+
+    Home(
+        assuntos = sampleAssuntos,
+        onAssuntoClick = {},
+        onStatusChange = { _, _ -> } // Usa { _, _ -> } para uma função de dois parâmetros
+    )
 }

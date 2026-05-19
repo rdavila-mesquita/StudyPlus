@@ -14,15 +14,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +38,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+
 import com.example.study.R
 import com.example.study.viewModel.Assunto
 
@@ -47,6 +58,10 @@ fun AssuntoScreen(
     onStatusChange: (Boolean) -> Unit
 ){
 
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -55,7 +70,7 @@ fun AssuntoScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 30.dp, vertical = 80.dp)
+                .padding(horizontal = 30.dp, vertical = 50.dp)
                 .clip(shape = RoundedCornerShape(15.dp))
                 .background(Color.White)
 
@@ -63,6 +78,8 @@ fun AssuntoScreen(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxSize()
+
+
             ) {
 
                 Icon(
@@ -79,16 +96,20 @@ fun AssuntoScreen(
                     painter = painterResource(R.drawable.ic_logo),
                     contentDescription = "logo",
                     modifier = Modifier
-                        .height(60.dp),
+                        .height(40.dp),
                     colorFilter = ColorFilter.tint(Color(0xFF2E3F9D))
                 )
 
                 Card(
                     modifier = Modifier
-                        .fillMaxHeight(0.7f)
+                        .fillMaxHeight(0.83f)
                         .align(Alignment.CenterHorizontally)
-                        .padding(20.dp)
-                        .width(300.dp)
+                        //  .background(Color.Gray)
+                        .padding(10.dp)
+                        .width(300.dp),
+                    colors = CardDefaults.cardColors(Color.White),
+                    // border = BorderStroke(width = 2.dp, color = Color(0xFFC0C0C0))
+
                 ) {
                     Text(
                         text = assunto.titulo,
@@ -102,33 +123,40 @@ fun AssuntoScreen(
                     )
                     Text(
                         text = assunto.descricao,
-                        fontSize = 20.sp,
+                        fontSize = 14.sp,
                         color = Color(0xFF2E3F9D),
-                        textAlign = TextAlign.Center,
+                        textAlign = TextAlign.Left,
+
                         modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(vertical = 10.dp)
+//                            .align(Alignment.CenterHorizontally)
+                            .padding(vertical = 10.dp, horizontal = 16.dp)
+                            .verticalScroll(rememberScrollState())
+
                     )
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Text("Concluído:")
-                        Checkbox(
-                            checked = assunto.concluida,
-                            onCheckedChange = { novoStatus ->
-                                onStatusChange(novoStatus)
-                            }
 
-                        )
-                    }
                 }
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .padding(vertical = 10.dp)
+                ) {
+                    Text("Concluído:")
+                    Checkbox(
+                        checked = assunto.concluida,
+                        onCheckedChange = { novoStatus ->
+                            onStatusChange(novoStatus)
+                        }
+
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
 //                    verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -143,7 +171,7 @@ fun AssuntoScreen(
                             )
                         }
                         IconButton(
-                            onClick = onDelete,
+                            onClick = {showDeleteDialog = true},
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_delete),
@@ -163,6 +191,27 @@ fun AssuntoScreen(
                     }
                 }
 
+                if (showDeleteDialog){
+                    AlertDialog(
+                        onDismissRequest = { showDeleteDialog = false},
+                        title = {Text("Confirmar Exclusão")},
+                        text = {Text("Tem certeza que deseja excluir este card?")},
+                        confirmButton = {
+                            TextButton( onClick = {
+                                onDelete()
+                                showDeleteDialog =false
+                            }) {
+                                Text("Excluir", color = Color.Red)
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = {showDeleteDialog = false}) {
+                                Text("Cancelar")
+                            }
+                        }
+                    )
+                }
+
             }
         }
     }
@@ -176,7 +225,7 @@ fun MetaScreenPreview(){
         assunto = Assunto(
             id = "1",
             titulo = "Título da Meta",
-            descricao = "Assunto de exemplo",
+            descricao = "Lorem IpsumIpsum is simply dummy text of the printinLorem Ipsum is simIpsum s Lorem IpsumIpsum is simply dummy text of the printinLorem Ipsum is simIpsum s simply dummy text of the printiLorem IpsumIpsum is simply dummy text of the printinLorem Ipsum is simIpsum s simply dummy text of the printiLorem IpsumIpsum is simply dummy text of the printinLorem Ipsum is simIpsum s simply dummy text of the printiLorem IpsumIpsum is simply dummy text of the printinLorem Ipsum is simIpsum s simply dummy text of the printiLorem IpsumIpsum is simply dummy text of the printinLorem Ipsum is simIpsum s simply dummy text of the printiLorem IpsumIpsum is simply dummy text of the printinLorem Ipsum is simIpsum s simply dummy text of the printisimply dummy text of the printinLorem Ipsum is simIpsum is simply dummy text of the printinLos simply dummy text of the printinLorem Ipsum is simIpsum is simply dummy text of the printinLos simply dummy text of the printinLorem Ipsum is simIpsums simply dummy text of the printinLorem Ipsum is simIpsum is simply dummy text of the printinLos simply dummy text of the printinLorem Ipsum is simIpsum is simply dummy text of the printinLos simply dummy text of the printinLorem Ipsum is simIpsum is simply dummy text of the printinLos simply dummy text of the printinLorem Ipsum is simIpsum is simply dummy text of the printinLos simply dummy text of the printinLorem Ipsum is simIpsum is simply dummy text of the printinLos simply dummy text of the printinLorem Ipsum is simIpsum is simply dummy text of the printinLo is simply dummy text of the printinLois simply dummy text of the printinLorem Ips printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
             concluida = false
         ),
         onDelete = {},
@@ -184,5 +233,13 @@ fun MetaScreenPreview(){
         onFocus = {},
         onHomeClick = {},
         onStatusChange = {_ ->}
+    )
+}
+
+@Composable
+fun CheckBox(assunto: Assunto, onStatusChange: (Boolean) -> Unit) {
+    Checkbox(
+        checked = assunto.concluida,
+        onCheckedChange = onStatusChange
     )
 }

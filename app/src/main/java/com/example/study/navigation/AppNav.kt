@@ -46,7 +46,7 @@ fun AppNav(
                 mode = AuthMode.SignIn,
                 onPrimary = { email, password, user -> vm.signIn(email, password) },
                 onForgotPassword = {},
-                onSwitch = { nav.navigate(Screen.SignIn.route) }
+                onSwitch = { nav.navigate(Screen.SignUp.route) }
             )
             LaunchedEffect(state.user) { if (state.user != null) gotoHome(nav) }
         }
@@ -74,7 +74,7 @@ fun AppNav(
                 onAdd = { nav.navigate(Screen.AddAssunto.route) },
                 onLogout = {
                     vm.signOut()
-                    nav.navigate(Screen.SplashScreen.route){
+                    nav.navigate(Screen.SplashScreen.route) {
                         popUpTo(Screen.Home.route) {
                             inclusive = true
                         }
@@ -83,6 +83,9 @@ fun AppNav(
                 assuntos = assuntosNConcluidos,
                 onAssuntoClick = { assunto ->
                     nav.navigate(Screen.AssuntoScreen.createRoute(assuntoId = assunto.id))
+                },
+                onStatusChange = { assunto, novoStatus ->
+                    avm.atualizaStatus(assunto.id, novoStatus)
                 }
             )
         }
@@ -123,7 +126,7 @@ fun AppNav(
                 onHomeClick = { nav.navigate(Screen.Home.route) },
                 onSaveAssunto = { novoTitulo, novoAssunto ->
                     avm.updateAssunto(novoTitulo,novoAssunto, assuntoId)
-                    nav.popBackStack(Screen.Home.route, inclusive = false)
+                    nav.popBackStack()
                 },
                 onProgressMetaClick = { nav.navigate(Screen.ProgressoMetaScreen.route) }
             )
@@ -178,7 +181,11 @@ fun AppNav(
                 onHomeClick = { nav.navigate(Screen.Home.route) },
                 onProgressMetaClick = { nav.navigate(Screen.ProgressoMetaScreen.route) },
                 onAdd = { nav.navigate(Screen.AddAssunto.route) },
-                assuntos = assuntosConcluidos
+                assuntos = assuntosConcluidos,
+                onStatusChange = { assunto, novoStatus ->
+                    avm.atualizaStatus(assunto.id, novoStatus)
+                },
+                avm = avm
             )
         }
 

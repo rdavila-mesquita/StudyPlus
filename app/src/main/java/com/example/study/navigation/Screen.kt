@@ -3,7 +3,6 @@ package com.example.study.navigation
 import com.example.study.viewModel.Assunto
 
 sealed class Screen(val route: String) {
-    data object Login : Screen("login")
     data object SignIn : Screen("signin")
     data object SignUp : Screen("signup")
     data object Home : Screen("home")
